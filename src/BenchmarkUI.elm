@@ -63,11 +63,6 @@ view (Model model) =
         Benchmark benchmark ->
             column []
                 [ el [ Font.bold ] (text benchmark.name)
-                , el [ Font.bold ]
-                    (text (toString model.startTime))
-                , el
-                    [ Font.bold ]
-                    (text (toString model.stopTime))
                 , case ( model.startTime, model.stopTime ) of
                     ( Just srt, Just spt ) ->
                         row []

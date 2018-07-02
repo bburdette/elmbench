@@ -79,9 +79,13 @@ type Benchmodel
     | EDModel (BenchmarkUI.Model EDData)
 
 
+elementCount =
+    25000
+
+
 initialBenchmarkStates =
-    [ DModel (BenchmarkUI.initialModel (makeDictBenchmark 10000))
-    , EDModel (BenchmarkUI.initialModel (makeEveryDictBenchmark (Tuple.second (Util.uuidList (initialSeed 0) 10000))))
+    [ DModel (BenchmarkUI.initialModel (makeDictBenchmark elementCount))
+    , EDModel (BenchmarkUI.initialModel (makeEveryDictBenchmark (Tuple.second (Util.uuidList (initialSeed 0) elementCount))))
     ]
 
 
