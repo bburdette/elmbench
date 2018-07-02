@@ -80,7 +80,7 @@ type Benchmodel
 
 
 elementCount =
-    25000
+    125000
 
 
 initialBenchmarkStates =
