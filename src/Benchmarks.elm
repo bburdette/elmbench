@@ -13,6 +13,7 @@ import Html exposing (Html)
 import Html.Attributes as HA
 import Http
 import Random.Pcg exposing (Seed, initialSeed, step)
+import TDict
 import Time
 import Util
 import Uuid exposing (Uuid)
@@ -70,6 +71,49 @@ makeEveryDictBenchmark uuids =
         }
 
 
+type TDId
+    = TDId Int
+
+
+ktc : TDId -> Int
+ktc (TDId id) =
+    id
+
+
+type alias TDData =
+    { tdict : TDict.TDict TDId Int String, keys : List TDId }
+
+
+tDictBench : TDData -> String
+tDictBench data =
+    let
+        result =
+            List.map (\idx -> TDict.get idx data.tdict) data.keys
+    in
+    "blah"
+
+
+makeTDictBenchmark : Int -> BenchmarkUI.Benchmark TDData
+makeTDictBenchmark count =
+    let
+        dl =
+            List.indexedMap (\i v -> ( TDId i, v )) (List.repeat count "blah")
+
+        te : TDict.TDict TDId Int String
+        te =
+            TDict.empty ktc
+
+        td : TDict.TDict TDId Int String
+        td =
+            TDict.insertList dl te
+    in
+    BenchmarkUI.Benchmark
+        { data = { tdict = td, keys = List.map Tuple.first dl }
+        , ftn = tDictBench
+        , name = "TDict TDId Int String Benchmark"
+        }
+
+
 
 ------------------------------------------------------------
 
@@ -77,6 +121,7 @@ makeEveryDictBenchmark uuids =
 type Benchmodel
     = DModel (BenchmarkUI.Model DData)
     | EDModel (BenchmarkUI.Model EDData)
+    | TModel (BenchmarkUI.Model TDData)
 
 
 elementCount =
@@ -86,6 +131,7 @@ elementCount =
 initialBenchmarkStates =
     [ DModel (BenchmarkUI.initialModel (makeDictBenchmark elementCount))
     , EDModel (BenchmarkUI.initialModel (makeEveryDictBenchmark (Tuple.second (Util.uuidList (initialSeed 0) elementCount))))
+    , TModel (BenchmarkUI.initialModel (makeTDictBenchmark elementCount))
     ]
 
 
@@ -107,6 +153,9 @@ view bms =
                         Element.map (BMsg idx) <| BenchmarkUI.view dm
 
                     EDModel edm ->
+                        Element.map (BMsg idx) <| BenchmarkUI.view edm
+
+                    TModel edm ->
                         Element.map (BMsg idx) <| BenchmarkUI.view edm
             )
             bms
@@ -132,6 +181,13 @@ update (BMsg idx uimsg) models =
                                     BenchmarkUI.update uimsg mod
                             in
                             ( EDModel nmod, BCmd idx cmd )
+
+                        TModel mod ->
+                            let
+                                ( nmod, cmd ) =
+                                    BenchmarkUI.update uimsg mod
+                            in
+                            ( TModel nmod, BCmd idx cmd )
             in
             ( List.concat
                 [ List.take idx models
